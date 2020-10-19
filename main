@@ -1,0 +1,68 @@
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../providers/loading_provider.dart';
+import '../providers/settings_provider.dart';
+import '../ui/homepage.dart';
+import '../ui/color_constant.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:provider/provider.dart';
+
+void main() async{
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+  runApp(const Call());
+}
+
+class Call extends StatefulWidget {
+  const Call();
+
+
+
+  @override
+  _CallState createState() => _CallState();
+}
+
+class _CallState extends State<Call> {
+  @override
+  Widget build(BuildContext context) {
+
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (BuildContext context) => SettingsProvider()),
+        ChangeNotifierProvider(create: (BuildContext context)=> LoadingProvider()),
+      ],
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData.from(
+          textTheme: TextTheme(
+            headline1: TextStyle( // MAIN TEXT TITLE
+              color: colorWhite,
+              fontFamily: 'WorkSans',
+              letterSpacing: 0,
+              fontSize: 26,
+              fontWeight: FontWeight.normal,),
+            
+            //how to input Theme.of(context).textTheme.headline5  or  theme.textTheme.bodyText1
+
+          ),
+          colorScheme: const ColorScheme.light(),
+        ).copyWith(
+          pageTransitionsTheme: const PageTransitionsTheme(
+            builders: <TargetPlatform, PageTransitionsBuilder>{
+              TargetPlatform.android: ZoomPageTransitionsBuilder(),
+              TargetPlatform.iOS: ZoomPageTransitionsBuilder(),
+            },
+          ),
+          //appBarTheme: AppBarTheme(iconTheme: IconThemeData(color: Colors.red)),
+        ),
+        home: HomePage(),
+        //ListViewNote()
+        //FadeThroughTransitionDemo(),
+
+      ),
+    );
+  }
+}
