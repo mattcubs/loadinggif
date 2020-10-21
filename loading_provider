@@ -2,22 +2,14 @@ import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 
 
-class LoadingProvider with ChangeNotifier{
-  double _downloadPercentage;
-  //final downloadPercentage = ValueNotifier<int>(0);
+class LoadingProvider extends ChangeNotifier{
+  int _downloadPercentage = 0;
+  int get downloadPercentage => _downloadPercentage;
 
-  LoadingProvider(){
-    _downloadPercentage = 0;
-  }
-
-  //Getters
-  //String get units=>_units;
-  double get downloadPercentage => _downloadPercentage;
-
-  //Setters
-  void getPercentage(double percentage){
-    _downloadPercentage = percentage;
+  void getPercentage(int input) {
+    _downloadPercentage = input;
     notifyListeners();
     print(downloadPercentage);
   }
+
 }
