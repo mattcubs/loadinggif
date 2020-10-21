@@ -238,6 +238,9 @@ Future<List<ImageInfo>> fetchGif(ImageProvider provider) async{
 
     final Uri resolved = Uri.base.resolve(provider.url);
     final HttpClientRequest request = await _httpClient.getUrl(resolved);
+    //ChangeNotifierProvider(create: (BuildContext context)=> LoadingProvider());
+    Provider(create: (_) => LoadingProvider());
+    //Provider(create: (_) => ValueProvider());
     provider.headers?.forEach((String name, String value) {
       request.headers.add(name, value);
     });
@@ -245,13 +248,16 @@ Future<List<ImageInfo>> fetchGif(ImageProvider provider) async{
     data = await consolidateHttpClientResponseBytes(
         response,
         onBytesReceived: (int cumulative, int total) {
+          //downloadPercentage = cumulative/total;
 
-          downloadPercentage = cumulative/total;
-          downloadPercentage ==1? print('complete'): print('loading');
+          downloadPercentage = (cumulative/total).floor();
+          valuePercentage = (cumulative);
+          LoadingProvider().getPercentage(downloadPercentage);
+          //downloadPercentage ==1? LoadingProvider().getPercentage(downloadPercentage): print('loading');
           //Provider.of<LoadingProvider>(context).getPercentage(downloadPercentage);
-
-          loadingProvider.getPercentage(percentage) = downloadPercentage;
-
+          //LoadingProvider(downloadPercentage);
+          //ValueListenableProvider().getPercentage(valuePercentage);
+          //LoadingProvider().loadingProvider.value = downloadPercentage;
         }
 
     );
