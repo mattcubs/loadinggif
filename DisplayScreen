@@ -9,7 +9,7 @@ class ContourScreen extends StatefulWidget {
 }
 
 class _ContourScreenState extends State<ContourScreen> with TickerProviderStateMixin{
- //double downloadPercentage = 0.0;
+ 
 
 
   Future<void> _launchInBrowser(String url) async {
@@ -45,7 +45,7 @@ class _ContourScreenState extends State<ContourScreen> with TickerProviderStateM
 
   @override
   void initState() {
-    // TODO: implement initState
+    
     controller1 = GifController(vsync: this);
     controller2 = GifController(vsync: this);
     controller4= GifController(vsync: this);
@@ -72,7 +72,7 @@ class _ContourScreenState extends State<ContourScreen> with TickerProviderStateM
 
   @override
   Widget build(BuildContext context) {
-    //Provider(create: (_) => LoadingProvider(), child: GifImage());
+  
    final loadingProvider = Provider.of<LoadingProvider>(context);
     return  Scaffold(
       backgroundColor: Colors.white,
@@ -92,28 +92,8 @@ class _ContourScreenState extends State<ContourScreen> with TickerProviderStateM
                       create: (context) => ValueNotifier<int>(0),
                   child: Text('${loadingProvider.downloadPercentage}'),),
                   
-                     /*
-                   ValueListenableBuilder<int>(
-                    valueListenable: ValueProvider().downloadPercentage,
-                    builder: (context,value, _){
-                      return
-                        LoadingProvider().downloadPercentage !=1 ? AnimatedBuilder(animation: ValueProvider().downloadPercentage,  builder: (BuildContext context, Widget child) {
-                          return Container(child: LinearProgressIndicator(),
-                          );
-                        },): Container();
-                    },
-                  ),
-
-
-                  //Text(Provider.of<LoadingProvider>(context).downloadPercentage.toString()),
-
-                  Consumer<LoadingProvider>(builder: (context, loadingProvider, _){
-                    return Text(loadingProvider.downloadPercentage.toString());
-                  }),
-                   */
-
-
-                  //loadingProvider.downloadPercentage !=1.0 ? SizedBox(height: MediaQuery.of(context).size.height*0.2, width: MediaQuery.of(context).size.width,child: LinearProgressIndicator()):Container(),
+                  
+                
                   if(widget.note.animation!=''&&widget.note.frames !='') Card(
                     semanticContainer: true,
                     clipBehavior: Clip.antiAliasWithSaveLayer,
@@ -150,6 +130,5 @@ class _ContourScreenState extends State<ContourScreen> with TickerProviderStateM
     );
   }
 }
-
 
 
