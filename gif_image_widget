@@ -181,8 +181,7 @@ class GifImageState extends State<GifImage>{
   @override
   Widget build(BuildContext context) {
 
-    //var loadingProvider = Provider.of<LoadingProvider>(context);
-    //loadingProvider.getPercentage(downloadPercentage);
+  
     final RawImage image = new RawImage(
       image: _imageInfo?.image,
       width: widget.width,
@@ -227,7 +226,6 @@ Future<List<ImageInfo>> fetchGif(ImageProvider provider) async{
   List<ImageInfo> infos = [];
   dynamic data;
   double downloadPercentage = 0;
-  //var loadingProvider = Provider.of<LoadingProvider>(context);
 
   String key =provider is NetworkImage?provider.url:provider is AssetImage?provider.assetName:provider is MemoryImage?provider.bytes.toString():"";
   if(GifImage.cache.caches.containsKey(key)){
@@ -238,9 +236,8 @@ Future<List<ImageInfo>> fetchGif(ImageProvider provider) async{
 
     final Uri resolved = Uri.base.resolve(provider.url);
     final HttpClientRequest request = await _httpClient.getUrl(resolved);
-    //ChangeNotifierProvider(create: (BuildContext context)=> LoadingProvider());
     Provider(create: (_) => LoadingProvider());
-    //Provider(create: (_) => ValueProvider());
+  
     provider.headers?.forEach((String name, String value) {
       request.headers.add(name, value);
     });
@@ -248,16 +245,9 @@ Future<List<ImageInfo>> fetchGif(ImageProvider provider) async{
     data = await consolidateHttpClientResponseBytes(
         response,
         onBytesReceived: (int cumulative, int total) {
-          //downloadPercentage = cumulative/total;
-
           downloadPercentage = (cumulative/total).floor();
-          valuePercentage = (cumulative);
           LoadingProvider().getPercentage(downloadPercentage);
-          //downloadPercentage ==1? LoadingProvider().getPercentage(downloadPercentage): print('loading');
-          //Provider.of<LoadingProvider>(context).getPercentage(downloadPercentage);
-          //LoadingProvider(downloadPercentage);
-          //ValueListenableProvider().getPercentage(valuePercentage);
-          //LoadingProvider().loadingProvider.value = downloadPercentage;
+        
         }
 
     );
