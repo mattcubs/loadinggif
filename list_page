@@ -1,0 +1,167 @@
+
+class NoteSection {
+  NoteSection(this.header);
+  final String header;
+  final items = <Note>[];
+  bool expanded = false;
+  void toggleExpand() => expanded = !expanded;
+}
+
+class ContourNoteList extends StatefulWidget {
+  ContourNoteList({
+    @required this.topic,
+    String collection, 
+  
+  }) : _collection = collection ?? topic;
+  final String topic;
+ 
+  static final _notesRef = FirebaseDatabase.instance
+      .reference()
+      .child('LINK');
+  @override
+  _ContourNoteListState createState() => _ContourNoteListState();
+}
+
+class _ContourNoteListState extends State<ContourNoteList> {
+  final _noteSections = <String, NoteSection>{};
+
+  int _itemCount = 0;
+
+  void _onNoteAdded(Note note) => setState(() {
+    final label =
+    note.theCategory?.isNotEmpty == true ? note.theCategory : 'Other';
+    _noteSections[label] ??= NoteSection(label);
+    _noteSections[label].items.add(note);
+    _itemCount += 1;
+  });
+
+  void _onNoteChanged(Note note) {
+    assert(
+    !(note.theCategory?.isNotEmpty == true) ||
+        _noteSections.containsKey(note.theCategory),
+    'Section should have already existed');
+
+    final label = note.theCategory?.isNotEmpty == true ? note.theCategory : 'Other';
+    _noteSections[label] ??= NoteSection(label);
+    final oldIndex =
+    _noteSections[label].items.indexWhere((item) => item.id == note.id);
+
+    setState(() {
+      if (oldIndex >= 0) {
+        // Note might not exist, within the section, if its label changed
+        _noteSections[label].items[oldIndex] = note;
+      } else {
+        _noteSections[label].items.add(note);
+      }
+    });
+  }
+
+  Future _navigateToNote(BuildContext context, Note note) => Navigator.push(
+    context,
+    MaterialPageRoute(builder: (context) => ContourScreen(note)),
+  );
+
+  Widget _childBuilder(BuildContext context, ThemeData theme, Note note) {
+    return Card(
+      key: ValueKey(note.id),
+      color: Colors.white,
+      child: InkWell(
+        onTap: () => _navigateToNote(context, note),
+        customBorder: ContourNoteList._cardShape,
+        splashColor: Color(0xffBEEAF3),
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Row(
+            children: <Widget>[
+              ColorContainer(note.theColor),
+              SizedBox(width: 15),
+              Expanded(
+                flex: 1,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>
+                    RichText(
+                      softWrap: true,
+                      text: TextSpan(
+                        children: <TextSpan>[
+                          TextSpan(
+                              text: '${note.theCategory}',
+                              style: theme.textTheme.headline5),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  
+  Widget _listBuilder(
+      BuildContext context,
+      RealtimeListBuilderState<Note> state,
+      ) {
+    final theme = Theme.of(context);
+
+    final sections = _noteSections.values.toList(growable: false);
+    return ListView.builder(
+      itemCount: sections.length,
+      itemBuilder: (context, index) {
+        final section = sections[index];
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: <Widget>[
+            header,
+            if (section.expanded)
+              ...section.items
+                  .map((item) => _childBuilder(context, theme, item)),
+          ],
+        );
+      },
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return RealtimeListBuilder<Note>(
+      reference: ContourNoteList._notesRef.child(widget._collection),
+      serializer: (snapshot) => Note.fromSnapshot(snapshot),
+      onChildAdded: _onNoteAdded,
+      onChildChanged: _onNoteChanged,
+      builder: (context, state) => NestedScrollView(
+        headerSliverBuilder: (_, __) => [
+          SliverAppBar(
+            automaticallyImplyLeading: false,
+            title: Row(
+              children: <Widget>[
+                TitleButton(),
+                const Expanded(
+                  child: SizedBox(
+                    width: 30,
+                  ),
+                ),
+           
+              ],
+            ),
+            expandedHeight: 110,
+            floating: false,
+            pinned: true,
+            backgroundColor: colorTheme,
+            ),
+          ),
+        ],
+        body: PageTransitionSwitcher(
+          transitionBuilder: _transition,
+          child: _listBuilder(context, state),
+        ),
+      ),
+    );
+  }
+}
